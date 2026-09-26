@@ -1,0 +1,26 @@
+{
+    "organization_id": "hospital_a",
+    "mapping_version": "1.0",
+    "lab_codes": {
+      "LAB-44": {
+        "system": "LOINC",
+        "code": "718-7",
+        "display": "Hemoglobin"
+      }
+    },
+    "unit_conversions": {
+      "hemoglobin": {
+        "g/dL": {
+          "canonical_unit": "g/dL",
+          "factor": 1.0,
+          "offset": 0.0
+        }
+      }
+    },
+    "semantic_type_categories": {
+      "T047": "condition",
+      "T121": "medication",
+      "T184": "symptom",
+      "T033": "procedure"
+    }
+  }

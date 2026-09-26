@@ -1,0 +1,51 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Canonical Clinical Record",
+    "type": "object",
+    "required": [
+      "schema_version",
+      "patient",
+      "encounter",
+      "facts",
+      "quality"
+    ],
+    "properties": {
+      "schema_version": {
+        "type": "string"
+      },
+      "patient": {
+        "type": "object",
+        "required": ["source_patient_id"],
+        "properties": {
+          "source_patient_id": {
+            "type": ["string", "null"]
+          },
+          "birth_date": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "encounter": {
+        "type": "object",
+        "properties": {
+          "source_encounter_id": {
+            "type": ["string", "null"]
+          },
+          "event_time": {
+            "type": ["string", "null"]
+          }
+        }
+      },
+      "facts": {
+        "type": "array"
+      },
+      "quality": {
+        "type": "object",
+        "required": [
+          "missing_required",
+          "conflicts",
+          "warnings"
+        ]
+      }
+    }
+  }

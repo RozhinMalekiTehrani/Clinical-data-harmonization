@@ -1,0 +1,7 @@
+pandas
+pydantic
+jsonschema
+spacy
+scispacy
+negspacy
+pytest
