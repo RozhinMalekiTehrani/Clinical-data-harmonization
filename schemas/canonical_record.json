@@ -1,6 +1,6 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "Canonical Clinical Record",
+    "title": "DH-2026-02 Canonical Clinical Record",
     "type": "object",
     "required": [
       "schema_version",
@@ -15,33 +15,141 @@
       },
       "patient": {
         "type": "object",
-        "required": ["source_patient_id"],
+        "required": [
+          "source_patient_id",
+          "birth_date"
+        ],
         "properties": {
           "source_patient_id": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "birth_date": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
       "encounter": {
         "type": "object",
+        "required": [
+          "source_encounter_id",
+          "event_time"
+        ],
         "properties": {
           "source_encounter_id": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "event_time": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
       "facts": {
-        "type": "array"
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "category",
+            "concept",
+            "value",
+            "assertion",
+            "temporality",
+            "effective_time",
+            "source_ref",
+            "extraction_method",
+            "review_status"
+          ],
+          "properties": {
+            "category": {
+              "enum": [
+                "medication",
+                "condition",
+                "observation",
+                "symptom",
+                "procedure"
+              ]
+            },
+            "concept": {
+              "type": "object",
+              "required": [
+                "system",
+                "code",
+                "display"
+              ]
+            },
+            "value": {
+              "type": "object",
+              "required": [
+                "number",
+                "text",
+                "unit"
+              ]
+            },
+            "assertion": {
+              "enum": [
+                "present",
+                "absent",
+                "uncertain"
+              ]
+            },
+            "temporality": {
+              "enum": [
+                "current",
+                "historical",
+                "planned",
+                "unknown"
+              ]
+            },
+            "effective_time": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "source_ref": {
+              "type": "object",
+              "required": [
+                "document_id",
+                "field_path",
+                "text_span"
+              ]
+            },
+            "extraction_method": {
+              "enum": [
+                "rule",
+                "dictionary",
+                "terminology",
+                "model"
+              ]
+            },
+            "review_status": {
+              "enum": [
+                "accepted",
+                "needs_review",
+                "rejected"
+              ]
+            }
+          }
+        }
       },
       "quality": {
         "type": "object",
         "required": [
+          "missing",
+          "unknown",
+          "not_mentioned",
+          "conflicting",
           "missing_required",
           "conflicts",
           "warnings"

@@ -1,14 +1,25 @@
-def collect_review_items(record):
-
-    review_items = []
+def build_review_queue(record):
+    queue = []
 
     for fact in record.get("facts", []):
 
         if fact.get("review_status") == "needs_review":
 
-            review_items.append({
+            queue.append({
                 "type": "fact",
+                "reason": "fact_requires_review",
                 "fact": fact
             })
 
-    return review_items
+    for conflict in record.get(
+        "quality",
+        {}
+    ).get("conflicts", []):
+
+        queue.append({
+            "type": "conflict",
+            "reason": "source_conflict",
+            "conflict": conflict
+        })
+
+    return queue

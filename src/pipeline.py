@@ -1,67 +1,122 @@
-from pathlib import Path
-import csv
-import json
+from .conflicts import detect_medication_conflicts
+from .review_queue import build_review_queue
+from .structured import process_csv_record
+from .narrative import process_narrative
+from .validation import validate_record
 
 
-# --------------------------------------------------
-# Project paths
-# --------------------------------------------------
+def run_pipeline(
+    structured_records,
+    narrative_text,
+    mapping,
+    structured_document_id,
+    narrative_document_id,
+    schema_path,
+    nlp
+):
 
-# The project root is the parent directory of src/
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+    all_facts = []
 
-DATA_DIR = PROJECT_ROOT / "data"
-CONFIG_DIR = PROJECT_ROOT / "config"
-OUTPUT_DIR = PROJECT_ROOT / "outputs"
+    structured_records_output = []
 
+    for index, record in enumerate(
+        structured_records
+    ):
 
-# --------------------------------------------------
-# Data loading
-# --------------------------------------------------
+        result = process_csv_record(
+            record=record,
+            row_index=index,
+            document_id=structured_document_id,
+            mapping=mapping
+        )
 
-def load_csv_records(filename: str):
-    """Load a structured CSV file from data/structured/."""
+        structured_records_output.append(
+            result
+        )
 
-    csv_path = DATA_DIR / "structured" / filename
+        all_facts.extend(
+            result["facts"]
+        )
 
-    with csv_path.open("r", encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f)
-        return list(reader)
+    narrative_output = process_narrative(
+        text=narrative_text,
+        document_id=narrative_document_id,
+        nlp=nlp
+    )
 
+    all_facts.extend(
+        narrative_output["facts"]
+    )
 
-def load_narrative(filename: str):
-    """Load a narrative text file from data/unstructured/."""
+    conflicts = detect_medication_conflicts(
+        all_facts
+    )
 
-    txt_path = DATA_DIR / "unstructured" / filename
+    quality = {
+        "missing": [],
+        "unknown": [],
+        "not_mentioned": [],
+        "conflicting": conflicts,
+        "missing_required": [],
+        "conflicts": conflicts,
+        "warnings": []
+    }
 
-    with txt_path.open("r", encoding="utf-8") as f:
-        return f.read()
+    for result in structured_records_output:
 
+        result_quality = result["quality"]
 
-def load_mapping(filename: str):
-    """Load an organization-specific mapping configuration."""
+        quality["missing_required"].extend(
+            result_quality["missing_required"]
+        )
 
-    config_path = CONFIG_DIR / filename
+        quality["unknown"].extend(
+            result_quality["unknown"]
+        )
 
-    with config_path.open("r", encoding="utf-8") as f:
-        return json.load(f)
+    for fact in all_facts:
 
+        if fact.get("assertion") == "uncertain":
+            quality["warnings"].append(
+                "uncertain_assertion_present"
+            )
 
-# --------------------------------------------------
-# Test loading
-# --------------------------------------------------
+    canonical_record = {
+        "schema_version": "1.0",
+        "patient": {
+            "source_patient_id": (
+                structured_records[0].get(
+                    "patient_id"
+                )
+                if structured_records
+                else None
+            ),
+            "birth_date": None
+        },
+        "encounter": {
+            "source_encounter_id": None,
+            "event_time": (
+                structured_records[0].get(
+                    "result_time"
+                )
+                if structured_records
+                else None
+            )
+        },
+        "facts": all_facts,
+        "quality": quality
+    }
 
-if __name__ == "__main__":
+    validate_record(
+        canonical_record,
+        schema_path
+    )
 
-    csv_records = load_csv_records("patient_lab_results.csv")
-    narrative_text = load_narrative("note_N204.txt")
-    local_mapping = load_mapping("hospital_a_mappings.json")
+    review_queue = build_review_queue(
+        canonical_record
+    )
 
-    print("CSV loaded:")
-    print(csv_records)
-
-    print("\nNarrative loaded:")
-    print(narrative_text)
-
-    print("\nMapping loaded:")
-    print(local_mapping)
+    return {
+        "canonical_record": canonical_record,
+        "review_queue": review_queue
+    }

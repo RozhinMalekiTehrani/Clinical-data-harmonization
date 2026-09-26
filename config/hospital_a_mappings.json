@@ -9,18 +9,36 @@
       }
     },
     "unit_conversions": {
-      "hemoglobin": {
+      "Hb": {
         "g/dL": {
           "canonical_unit": "g/dL",
+          "factor": 1.0,
+          "offset": 0.0
+        },
+        "g/L": {
+          "canonical_unit": "g/dL",
+          "factor": 0.1,
+          "offset": 0.0
+        }
+      },
+      "Creatinine": {
+        "mg/dL": {
+          "canonical_unit": "mg/dL",
           "factor": 1.0,
           "offset": 0.0
         }
       }
     },
-    "semantic_type_categories": {
-      "T047": "condition",
-      "T121": "medication",
-      "T184": "symptom",
-      "T033": "procedure"
+    "medications": {
+      "apixaban": {
+        "system": "RXNORM",
+        "code": "1362086",
+        "display": "apixaban"
+      },
+      "rivaroxaban": {
+        "system": "RXNORM",
+        "code": "1361559",
+        "display": "rivaroxaban"
+      }
     }
   }

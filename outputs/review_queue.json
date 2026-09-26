@@ -1,0 +1,77 @@
+[
+  {
+    "fact": {
+      "assertion": "present",
+      "category": "medication",
+      "concept": {
+        "code": "1362086",
+        "display": "apixaban",
+        "system": "RXNORM"
+      },
+      "effective_time": null,
+      "extraction_method": "rule",
+      "review_status": "needs_review",
+      "source_ref": {
+        "document_id": "note_N204.txt",
+        "field_path": null,
+        "text_span": {
+          "end_char": 149,
+          "start_char": 124,
+          "text": "Apixaban 5 mg twice daily"
+        }
+      },
+      "temporality": "current",
+      "value": {
+        "number": null,
+        "text": "5 mg; twice daily",
+        "unit": null
+      }
+    },
+    "reason": "fact_requires_review",
+    "type": "fact"
+  },
+  {
+    "fact": {
+      "assertion": "present",
+      "category": "medication",
+      "concept": {
+        "code": "1361559",
+        "display": "rivaroxaban",
+        "system": "RXNORM"
+      },
+      "effective_time": null,
+      "extraction_method": "rule",
+      "review_status": "needs_review",
+      "source_ref": {
+        "document_id": "note_N204.txt",
+        "field_path": null,
+        "text_span": {
+          "end_char": 269,
+          "start_char": 258,
+          "text": "rivaroxaban"
+        }
+      },
+      "temporality": "historical",
+      "value": {
+        "number": null,
+        "text": null,
+        "unit": null
+      }
+    },
+    "reason": "fact_requires_review",
+    "type": "fact"
+  },
+  {
+    "conflict": {
+      "facts": [
+        "apixaban",
+        "rivaroxaban"
+      ],
+      "reason": "Different medication sources contain apixaban and rivaroxaban; the pipeline does not choose between them.",
+      "status": "needs_review",
+      "type": "medication_conflict"
+    },
+    "reason": "source_conflict",
+    "type": "conflict"
+  }
+]

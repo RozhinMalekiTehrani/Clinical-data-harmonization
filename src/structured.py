@@ -1,5 +1,10 @@
 from datetime import datetime
-from .mappings import map_local_lab_code, normalize_unit
+
+from .mappings import (
+    map_lab_code,
+    normalize_unit,
+    normalize_numeric_value
+)
 
 
 def parse_datetime(value):
@@ -7,12 +12,20 @@ def parse_datetime(value):
         return None
 
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00")).isoformat()
+        return datetime.fromisoformat(
+            value.replace("Z", "+00:00")
+        ).isoformat()
+
     except ValueError:
         return None
 
 
-def process_csv_record(record, row_idx, document_id, mapping):
+def process_csv_record(
+    record,
+    row_index,
+    document_id,
+    mapping
+):
     patient_id = record.get("patient_id") or None
     local_code = record.get("test_code") or None
     test_name = record.get("test_name") or None
@@ -20,72 +33,78 @@ def process_csv_record(record, row_idx, document_id, mapping):
     raw_unit = record.get("result_unit") or None
     raw_time = record.get("result_time") or None
 
-    concept = map_local_lab_code(local_code, mapping)
-
-    missing_required = []
+    missing = []
     warnings = []
 
-    if not patient_id:
-        missing_required.append("patient_id")
-
-    if not raw_value:
-        missing_required.append("result_value")
-
-    if not raw_unit:
-        missing_required.append("result_unit")
-
-    parsed_time = parse_datetime(raw_time)
-
-    if raw_time and parsed_time is None:
-        missing_required.append("invalid_result_time")
+    concept = map_lab_code(
+        local_code,
+        mapping
+    )
 
     if concept is None:
-        missing_required.append("unmapped_local_code")
+        missing.append("unknown_local_code")
 
-    numeric_value = None
+    if raw_unit is None:
+        missing.append("missing_unit")
 
-    if raw_value:
-        try:
-            numeric_value = float(raw_value)
-        except ValueError:
-            warnings.append("result_value_not_numeric")
+    normalized_time = parse_datetime(
+        raw_time
+    )
 
-    canonical_unit = None
+    if raw_time and normalized_time is None:
+        missing.append("invalid_date")
 
-    if concept and raw_unit:
-        canonical_unit = normalize_unit(
-            concept["display"],
-            raw_unit,
-            mapping
-        )
+    unit_config = normalize_unit(
+        test_name,
+        raw_unit,
+        mapping
+    )
 
-        if canonical_unit is None:
-            missing_required.append("unresolved_unit")
+    normalized_value = normalize_numeric_value(
+        raw_value,
+        unit_config
+    ) if unit_config else None
 
-    review_status = (
-        "needs_review"
-        if missing_required
-        else "accepted"
+    if raw_value is not None and normalized_value is None:
+        missing.append("invalid_numeric_value")
+
+    if not patient_id:
+        missing.append("missing_patient_id")
+
+    if concept is None:
+        concept = {
+            "system": "LOCAL",
+            "code": local_code,
+            "display": test_name
+        }
+
+    if missing:
+        review_status = "needs_review"
+    else:
+        review_status = "accepted"
+
+    canonical_unit = (
+        unit_config["canonical_unit"]
+        if unit_config
+        else raw_unit
     )
 
     fact = {
         "category": "observation",
-        "concept": concept or {
-            "system": "LOCAL_UNMAPPED",
-            "code": local_code,
-            "display": test_name
-        },
+        "concept": concept,
         "value": {
-            "number": numeric_value,
+            "number": normalized_value,
             "text": None,
             "unit": canonical_unit
         },
         "assertion": "present",
         "temporality": "current",
-        "effective_time": parsed_time,
+        "effective_time": normalized_time,
         "source_ref": {
             "document_id": document_id,
-            "field_path": f"row[{row_idx}].result_value",
+            "field_path": (
+                f"row[{row_index}].result_value"
+            ),
             "text_span": None
         },
         "extraction_method": "dictionary",
@@ -96,15 +115,23 @@ def process_csv_record(record, row_idx, document_id, mapping):
         "schema_version": "1.0",
         "patient": {
             "source_patient_id": patient_id,
-            "birth_date": record.get("birth_date") or None
+            "birth_date": None
         },
         "encounter": {
-            "source_encounter_id": record.get("encounter_id") or None,
-            "event_time": parsed_time
+            "source_encounter_id": None,
+            "event_time": normalized_time
         },
         "facts": [fact],
         "quality": {
-            "missing_required": missing_required,
+            "missing": [],
+            "unknown": (
+                ["local_code"]
+                if "unknown_local_code" in missing
+                else []
+            ),
+            "not_mentioned": [],
+            "conflicting": [],
+            "missing_required": missing,
             "conflicts": [],
             "warnings": warnings
         }

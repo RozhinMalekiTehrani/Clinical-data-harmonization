@@ -6,22 +6,72 @@ import json
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
-def load_csv_records(filename: str):
+def load_csv_records(filename):
     path = PROJECT_ROOT / "data" / "structured" / filename
 
-    with path.open("r", encoding="utf-8", newline="") as f:
-        return list(csv.DictReader(f))
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Structured input not found: {path}"
+        )
+
+    with path.open(
+        "r",
+        encoding="utf-8",
+        newline=""
+    ) as file:
+        return list(csv.DictReader(file))
 
 
-def load_narrative(filename: str):
+def load_narrative(filename):
     path = PROJECT_ROOT / "data" / "unstructured" / filename
 
-    with path.open("r", encoding="utf-8") as f:
-        return f.read()
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Narrative input not found: {path}"
+        )
+
+    with path.open(
+        "r",
+        encoding="utf-8"
+    ) as file:
+        return file.read()
 
 
-def load_mapping(filename: str):
-    path = PROJECT_ROOT / "config" / filename
+def load_json(filename, directory):
+    path = PROJECT_ROOT / directory / filename
 
-    with path.open("r", encoding="utf-8") as f:
-        return json.load(f)
+    if not path.exists():
+        raise FileNotFoundError(
+            f"JSON file not found: {path}"
+        )
+
+    with path.open(
+        "r",
+        encoding="utf-8"
+    ) as file:
+        return json.load(file)
+
+
+def save_json(data, filename):
+    output_dir = PROJECT_ROOT / "outputs"
+
+    output_dir.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    output_path = output_dir / filename
+
+    with output_path.open(
+        "w",
+        encoding="utf-8"
+    ) as file:
+        json.dump(
+            data,
+            file,
+            indent=2,
+            sort_keys=True,
+            ensure_ascii=False
+        )
+
+    return output_path

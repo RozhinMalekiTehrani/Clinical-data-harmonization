@@ -1,0 +1,200 @@
+{
+  "encounter": {
+    "event_time": "2026-08-11T09:30:00Z",
+    "source_encounter_id": null
+  },
+  "facts": [
+    {
+      "assertion": "present",
+      "category": "observation",
+      "concept": {
+        "code": "718-7",
+        "display": "Hemoglobin",
+        "system": "LOINC"
+      },
+      "effective_time": "2026-08-11T09:30:00+00:00",
+      "extraction_method": "dictionary",
+      "review_status": "accepted",
+      "source_ref": {
+        "document_id": "patient_lab_results.csv",
+        "field_path": "row[0].result_value",
+        "text_span": null
+      },
+      "temporality": "current",
+      "value": {
+        "number": 12.1,
+        "text": null,
+        "unit": "g/dL"
+      }
+    },
+    {
+      "assertion": "absent",
+      "category": "symptom",
+      "concept": {
+        "code": "CHEST_PAIN",
+        "display": "chest pain",
+        "system": "TEXT"
+      },
+      "effective_time": null,
+      "extraction_method": "rule",
+      "review_status": "accepted",
+      "source_ref": {
+        "document_id": "note_N204.txt",
+        "field_path": null,
+        "text_span": {
+          "end_char": 62,
+          "start_char": 45,
+          "text": "denies chest pain"
+        }
+      },
+      "temporality": "current",
+      "value": {
+        "number": null,
+        "text": null,
+        "unit": null
+      }
+    },
+    {
+      "assertion": "present",
+      "category": "symptom",
+      "concept": {
+        "code": "SHORTNESS_OF_BREATH",
+        "display": "shortness of breath",
+        "system": "TEXT"
+      },
+      "effective_time": null,
+      "extraction_method": "rule",
+      "review_status": "accepted",
+      "source_ref": {
+        "document_id": "note_N204.txt",
+        "field_path": null,
+        "text_span": {
+          "end_char": 121,
+          "start_char": 64,
+          "text": "Shortness of breath occurs only when climbing two flights"
+        }
+      },
+      "temporality": "current",
+      "value": {
+        "number": null,
+        "text": "occurs only when climbing two flights",
+        "unit": null
+      }
+    },
+    {
+      "assertion": "present",
+      "category": "medication",
+      "concept": {
+        "code": "1362086",
+        "display": "apixaban",
+        "system": "RXNORM"
+      },
+      "effective_time": null,
+      "extraction_method": "rule",
+      "review_status": "needs_review",
+      "source_ref": {
+        "document_id": "note_N204.txt",
+        "field_path": null,
+        "text_span": {
+          "end_char": 149,
+          "start_char": 124,
+          "text": "Apixaban 5 mg twice daily"
+        }
+      },
+      "temporality": "current",
+      "value": {
+        "number": null,
+        "text": "5 mg; twice daily",
+        "unit": null
+      }
+    },
+    {
+      "assertion": "present",
+      "category": "medication",
+      "concept": {
+        "code": "1361559",
+        "display": "rivaroxaban",
+        "system": "RXNORM"
+      },
+      "effective_time": null,
+      "extraction_method": "rule",
+      "review_status": "needs_review",
+      "source_ref": {
+        "document_id": "note_N204.txt",
+        "field_path": null,
+        "text_span": {
+          "end_char": 269,
+          "start_char": 258,
+          "text": "rivaroxaban"
+        }
+      },
+      "temporality": "historical",
+      "value": {
+        "number": null,
+        "text": null,
+        "unit": null
+      }
+    },
+    {
+      "assertion": "present",
+      "category": "observation",
+      "concept": {
+        "code": "CREATININE",
+        "display": "Creatinine",
+        "system": "LOCAL_TEXT"
+      },
+      "effective_time": null,
+      "extraction_method": "rule",
+      "review_status": "accepted",
+      "source_ref": {
+        "document_id": "note_N204.txt",
+        "field_path": null,
+        "text_span": {
+          "end_char": 200,
+          "start_char": 180,
+          "text": "Creatinine 1.6 mg/dL"
+        }
+      },
+      "temporality": "current",
+      "value": {
+        "number": 1.6,
+        "text": null,
+        "unit": "mg/dL"
+      }
+    }
+  ],
+  "patient": {
+    "birth_date": null,
+    "source_patient_id": "P1007"
+  },
+  "quality": {
+    "conflicting": [
+      {
+        "facts": [
+          "apixaban",
+          "rivaroxaban"
+        ],
+        "reason": "Different medication sources contain apixaban and rivaroxaban; the pipeline does not choose between them.",
+        "status": "needs_review",
+        "type": "medication_conflict"
+      }
+    ],
+    "conflicts": [
+      {
+        "facts": [
+          "apixaban",
+          "rivaroxaban"
+        ],
+        "reason": "Different medication sources contain apixaban and rivaroxaban; the pipeline does not choose between them.",
+        "status": "needs_review",
+        "type": "medication_conflict"
+      }
+    ],
+    "missing": [],
+    "missing_required": [],
+    "not_mentioned": [],
+    "unknown": [],
+    "warnings": []
+  },
+  "schema_version": "1.0"
+}
