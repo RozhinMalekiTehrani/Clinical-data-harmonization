@@ -1,4 +1,3 @@
-# DH-2026-02-clinical-data-harmonization_Rozhin
 # DH-2026-02 Clinical Data Harmonization
 
 Candidate reference: DH-2026-02
