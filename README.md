@@ -1,4 +1,4 @@
-# DH-2026-02 Clinical Data Harmonization
+# Clinical Data Harmonization
 
 ## Overview
 
