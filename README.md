@@ -58,4 +58,4 @@ Narrative note ────────┘
 
 
 
-SciSpaCy is used as a biomedical NLP component for narrative processing. Due to the assignment deadline, I planned to combine LLM-based and pretrained approaches using a majority-voting strategy, but I did not have enough time to implement this part.
+SciSpaCy is used as a biomedical NLP component for narrative processing. Next plan is to combine LLM-based and pretrained approaches using a majority-voting strategy.
