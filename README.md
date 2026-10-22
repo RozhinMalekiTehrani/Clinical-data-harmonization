@@ -1,7 +1,5 @@
 # DH-2026-02 Clinical Data Harmonization
 
-Candidate reference: DH-2026-02
-
 ## Overview
 
 This repository contains a small Python prototype for harmonizing heterogeneous
